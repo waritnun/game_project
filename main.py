@@ -127,6 +127,27 @@ class MovingLine:
         pygame.draw.line(surface, LEFT_LINE_COLOR, (ROAD_X, self.y), (ROAD_X + self.length / 2, self.y), LINE_WIDTH)
         pygame.draw.line(surface, RIGHT_LINE_COLOR, (ROAD_X + self.length / 2, self.y), (ROAD_X + self.length, self.y), LINE_WIDTH)
 
+class Obstacle:
+    def __init__(self, moving_line_speed):
+        self.width = 95
+        self.height = 100
+        # Randomly place the obstacle (car) within the road area
+        self.rect = pygame.Rect(
+            random.randint(ROAD_X, ROAD_X + ROAD_WIDTH - self.width),
+            -self.height,  # Start above the screen
+            self.width,
+            self.height,
+        )
+        self.speed = moving_line_speed
+        self.current_image = car_image3  # Default car image, can switch to another image based on speed
+
+    def move(self, moving_line_speed):
+        self.speed = moving_line_speed+1  # Move at the same speed as the moving line
+        self.rect.y += self.speed  # Move the car down
+
+    def draw(self, surface):
+        surface.blit(self.current_image, self.rect)  # Draw the car on the screen
+
 
 # Start screen
 def start_screen():
@@ -200,32 +221,6 @@ def winner_screen():
                     sys.exit()
 
 
-# Define the Obstacle class
-# Define the Obstacle class (now representing cars)
-class Obstacle:
-    def __init__(self, moving_line_speed):
-        self.width = 95
-        self.height = 100
-        # Randomly place the obstacle (car) within the road area
-        self.rect = pygame.Rect(
-            random.randint(ROAD_X, ROAD_X + ROAD_WIDTH - self.width),
-            -self.height,  # Start above the screen
-            self.width,
-            self.height,
-        )
-        self.speed = moving_line_speed
-        self.current_image = car_image3  # Default car image, can switch to another image based on speed
-
-    def move(self, moving_line_speed):
-        self.speed = moving_line_speed+1  # Move at the same speed as the moving line
-        self.rect.y += self.speed  # Move the car down
-
-    def draw(self, surface):
-        surface.blit(self.current_image, self.rect)  # Draw the car on the screen
-
-
-
-
 # Modify the main function to show the winner screen
 def main():
     clock = pygame.time.Clock()
@@ -240,8 +235,8 @@ def main():
     finished_point_shown = False  # Flag to check if finished point is shown
     left_speed_increase = random.randint(*LEFT_SPEED_INCREASE_RANGE)
     right_speed_increase = random.randint(*RIGHT_SPEED_INCREASE_RANGE)
-    left_speed_display = left_speed_increase
-    right_speed_display = right_speed_increase
+    left_speed_display = left_speed_increase * 8 
+    right_speed_display = right_speed_increase * 8
 
     start_time = pygame.time.get_ticks()  # Track the start time
     countdown_time = 30 * 1000  # 30 seconds in milliseconds
@@ -298,8 +293,8 @@ def main():
 
             left_speed_increase = random.randint(*LEFT_SPEED_INCREASE_RANGE)
             right_speed_increase = random.randint(*RIGHT_SPEED_INCREASE_RANGE)
-            left_speed_display = left_speed_increase
-            right_speed_display = right_speed_increase
+            left_speed_display = left_speed_increase * 8
+            right_speed_display = right_speed_increase * 8
 
             # Show finished point after passing 5 lines
             if lines_passed == 10:
@@ -345,7 +340,7 @@ def main():
             screen.blit(left_speed_text, (ROAD_X + 20, moving_line.y - 30))
             screen.blit(right_speed_text, (ROAD_X + ROAD_WIDTH - 40, moving_line.y - 30))
 
-        current_speed_text = font.render(f"Current Speed: {moving_line.speed}", True, WHITE)
+        current_speed_text = font.render(f"Current Speed: {moving_line.speed * 8} km/hr", True, WHITE)
         screen.blit(current_speed_text, (20, 20))
 
         # Display remaining time
